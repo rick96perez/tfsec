@@ -75,13 +75,13 @@ module enforce_mfa {
 `},
 			Links: []string{
 				"https://registry.terraform.io/modules/terraform-module/enforce-mfa/aws/latest",
-				"https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html#password-policy-details",
+				"https://aws.amazon.com/iam/features/mfa/",
 			},
 		},
 		Provider:        provider.AWSProvider,
 		RequiredTypes:   []string{"resource"},
 		RequiredLabels:  []string{"aws_iam_group"},
-		DefaultSeverity: severity.High,
+		DefaultSeverity: severity.Medium,
 		CheckFunc: func(set result.Set, resourceBlock block.Block, module block.Module) {
 			blocks, err := module.GetsModulesBySource("terraform-module/enforce-mfa/aws")
 			if err != nil || len(blocks) == 0 {
