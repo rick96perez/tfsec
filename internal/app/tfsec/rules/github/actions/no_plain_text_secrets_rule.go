@@ -5,9 +5,7 @@ package actions
 // Before making changes, consider updating the generator.
 
 import (
-	"github.com/aquasecurity/defsec/rules"
 	"github.com/aquasecurity/defsec/rules/github/actions"
-	"github.com/aquasecurity/tfsec/internal/app/tfsec/block"
 	"github.com/aquasecurity/tfsec/internal/app/tfsec/scanner"
 	"github.com/aquasecurity/tfsec/pkg/rule"
 )
@@ -39,15 +37,6 @@ resource "github_actions_environment_secret" "good_example" {
 		},
 		RequiredLabels: []string{
 			"github_actions_environment_secret",
-		},
-		CheckTerraform: func(resourceBlock block.Block, _ block.Module) (results rules.Results) {
-
-			plaintextValue := resourceBlock.GetAttribute("plaintext_value")
-			if plaintextValue.IsNotNil() {
-				results.Add("Resource '%s' has plaintext value set. For security reasons encrypted value should be set instead.", resourceBlock)
-
-			}
-			return results
 		},
 		Base: actions.CheckNoPlainTextActionEnvironmentSecrets,
 	})

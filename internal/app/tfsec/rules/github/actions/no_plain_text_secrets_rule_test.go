@@ -9,7 +9,7 @@ import (
 )
 
 func Test_GithubNo_plain_text_secrets_FailureExamples(t *testing.T) {
-	expectedCode := "github-actions-no-plain-text-secrets"
+	expectedCode := "github-actions-no-plain-text-action-secrets"
 
 	rule, err := scanner.GetRuleById(expectedCode)
 	if err != nil {
@@ -31,7 +31,7 @@ func Test_GithubNo_plain_text_secrets_FailureExamples(t *testing.T) {
 }
 
 func Test_GithubNo_plain_text_secrets_SuccessExamples(t *testing.T) {
-	expectedCode := "github-actions-no-plain-text-secrets"
+	expectedCode := "github-actions-no-plain-text-action-secrets"
 
 	rule, err := scanner.GetRuleById(expectedCode)
 	if err != nil {

@@ -260,6 +260,11 @@ func (b *HCLBlock) GetAttribute(name string) Attribute {
 	return attr
 }
 
+func (b *HCLBlock) GetAttributeValueAsStringOrDefault(name string, defaultValue string, parent Block) types.StringValue {
+	return b.GetAttribute(name).AsStringValueOrDefault(defaultValue, parent)
+
+}
+
 func (b *HCLBlock) GetNestedAttribute(name string) Attribute {
 
 	var returnAttr *HCLAttribute

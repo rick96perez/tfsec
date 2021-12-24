@@ -19,6 +19,7 @@ type Block interface {
 	GetBlocks(name string) Blocks
 	GetAttributes() []Attribute
 	GetAttribute(name string) Attribute
+	GetAttributeValueAsStringOrDefault(name string, defaultValue string, parent Block) types.StringValue
 	GetNestedAttribute(name string) Attribute
 	Reference() *Reference
 	LocalName() string
