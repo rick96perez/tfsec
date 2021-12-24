@@ -5,25 +5,16 @@ package actions
 // Before making changes, consider updating the generator.
 
 import (
+	"github.com/aquasecurity/defsec/rules"
+	"github.com/aquasecurity/defsec/rules/github/actions"
 	"github.com/aquasecurity/tfsec/internal/app/tfsec/block"
 	"github.com/aquasecurity/tfsec/internal/app/tfsec/scanner"
-	"github.com/aquasecurity/tfsec/pkg/provider"
-	"github.com/aquasecurity/tfsec/pkg/result"
 	"github.com/aquasecurity/tfsec/pkg/rule"
-	"github.com/aquasecurity/tfsec/pkg/severity"
 )
 
 func init() {
 	scanner.RegisterCheckRule(rule.Rule{
-		Provider:  provider.GitHubProvider,
-		Service:   "actions",
-		ShortCode: "no-plain-text-secrets",
-		Documentation: rule.RuleDocumentation{
-			Summary:     "Ensure plaintext value is not used for GitHub Action Environment Secret.",
-			Explanation: `For the purposes of security, the contents of the plaintext_value field have been marked as sensitive to Terraform, but this does not hide it from state files. State should be treated as sensitive always.`,
-			Impact:      "Unencrypted sensitive plaintext value can be easily accessible in code.",
-			Resolution:  "Do not store plaintext values in your code but rather populate the encrypted_value using fields from a resource, data source or variable.",
-			BadExample: []string{`
+		BadExample: []string{`
 resource "github_actions_environment_secret" "bad_example" {	 
 	repository       = "my repository name"
 	environment       = "my environment"
@@ -31,7 +22,7 @@ resource "github_actions_environment_secret" "bad_example" {
 	plaintext_value   = "sensitive secret string"
 }
 `},
-			GoodExample: []string{`
+		GoodExample: []string{`
 resource "github_actions_environment_secret" "good_example" {
 	repository       = "my repository name"
 	environment       = "my environment"
@@ -39,10 +30,9 @@ resource "github_actions_environment_secret" "good_example" {
 	encrypted_value   = var.some_encrypted_secret_string
 }
 `},
-			Links: []string{
-				"https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_environment_secret",
-				"https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions",
-			},
+		Links: []string{
+			"https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_environment_secret",
+			"https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions",
 		},
 		RequiredTypes: []string{
 			"resource",
@@ -50,14 +40,15 @@ resource "github_actions_environment_secret" "good_example" {
 		RequiredLabels: []string{
 			"github_actions_environment_secret",
 		},
-		DefaultSeverity: severity.High,
-		CheckFunc: func(set result.Set, resourceBlock block.Block, module block.Module) {
+		CheckTerraform: func(resourceBlock block.Block, _ block.Module) (results rules.Results) {
 
 			plaintextValue := resourceBlock.GetAttribute("plaintext_value")
 			if plaintextValue.IsNotNil() {
-				set.AddResult().WithDescription("Resource '%s' has plaintext value set. For security reasons encrypted value should be set instead.", resourceBlock.FullName()).
-					WithAttribute(plaintextValue)
+				results.Add("Resource '%s' has plaintext value set. For security reasons encrypted value should be set instead.", resourceBlock)
+
 			}
+			return results
 		},
+		Base: actions.CheckNoPlainTextActionEnvironmentSecrets,
 	})
 }
