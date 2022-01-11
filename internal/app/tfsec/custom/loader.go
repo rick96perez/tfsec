@@ -19,6 +19,8 @@ type ChecksFile struct {
 	Checks []*Check `json:"checks" yaml:"checks"`
 }
 
+var processedFiles = make(map[string]bool)
+
 func Load(customCheckDir string) error {
 	_, err := os.Stat(customCheckDir)
 	if os.IsNotExist(err) {
@@ -26,7 +28,6 @@ func Load(customCheckDir string) error {
 	} else if err != nil {
 		return err
 	}
-
 	return loadCustomChecks(customCheckDir)
 }
 
@@ -38,6 +39,11 @@ func loadCustomChecks(customCheckDir string) error {
 	var errorList []string
 	for _, file := range files {
 		checkFilePath := path.Join(customCheckDir, file.Name())
+		fmt.Println("Checking file path " + checkFilePath)
+		if _, exists := processedFiles[checkFilePath]; exists {
+			continue
+		}
+		processedFiles[checkFilePath] = true
 		err = Validate(checkFilePath)
 		if err != nil {
 			errorList = append(errorList, err.Error())
