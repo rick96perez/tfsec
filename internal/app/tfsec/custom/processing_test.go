@@ -122,8 +122,8 @@ var testAssignVariableMatchSpec = MatchSpec{
 	Action: "and",
 	PredicateMatchSpec: []MatchSpec{
 		{
-			Name:   "bucket",
-			Action: "isPresent",
+			Name:           "bucket",
+			Action:         "isPresent",
 			AssignVariable: "TFSEC_VAR_BUCKET_NAME",
 		},
 		{

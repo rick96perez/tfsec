@@ -16,7 +16,9 @@ var matchFunctions = map[CheckAction]func(block.Block, *MatchSpec, map[string]st
 	IsPresent: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
 		return block.HasChild(spec.Name) || spec.IgnoreUndefined
 	},
-	NotPresent: func(block block.Block, spec *MatchSpec, variables map[string]string) bool { return !block.HasChild(spec.Name) },
+	NotPresent: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+		return !block.HasChild(spec.Name)
+	},
 	IsEmpty: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
 		if block.MissingChild(spec.Name) {
 			return true
