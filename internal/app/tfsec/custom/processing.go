@@ -12,14 +12,14 @@ import (
 	"github.com/aquasecurity/tfsec/pkg/rule"
 )
 
-var matchFunctions = map[CheckAction]func(block.Block, *MatchSpec, map[string]string) bool{
-	IsPresent: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+var matchFunctions = map[CheckAction]func(block.Block, *MatchSpec, block.Module, map[string]string) bool{
+	IsPresent: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		return block.HasChild(spec.Name) || spec.IgnoreUndefined
 	},
-	NotPresent: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	NotPresent: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		return !block.HasChild(spec.Name)
 	},
-	IsEmpty: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	IsEmpty: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		if block.MissingChild(spec.Name) {
 			return true
 		}
@@ -31,93 +31,96 @@ var matchFunctions = map[CheckAction]func(block.Block, *MatchSpec, map[string]st
 		childBlock := block.GetBlock(spec.Name)
 		return childBlock.IsEmpty()
 	},
-	StartsWith: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	StartsWith: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.StartsWith(processMatchValueVariables(spec.MatchValue, variables))
 	},
-	EndsWith: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	EndsWith: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.EndsWith(processMatchValueVariables(spec.MatchValue, variables))
 	},
-	Contains: func(b block.Block, spec *MatchSpec, variables map[string]string) bool {
+	Contains: func(b block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := b.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.Contains(processMatchValueVariables(spec.MatchValue, variables), block.IgnoreCase)
 	},
-	NotContains: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	NotContains: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return !attribute.Contains(processMatchValueVariables(spec.MatchValue, variables))
 	},
-	Equals: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	Equals: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.Equals(processMatchValueVariables(spec.MatchValue, variables))
 	},
-	NotEqual: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	NotEqual: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.NotEqual(processMatchValueVariables(spec.MatchValue, variables))
 	},
-	LessThan: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	LessThan: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.LessThan(processMatchValueVariables(spec.MatchValue, variables))
 	},
-	LessThanOrEqualTo: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	LessThanOrEqualTo: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.LessThanOrEqualTo(processMatchValueVariables(spec.MatchValue, variables))
 	},
-	GreaterThan: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	GreaterThan: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.GreaterThan(processMatchValueVariables(spec.MatchValue, variables))
 	},
-	GreaterThanOrEqualTo: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	GreaterThanOrEqualTo: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.GreaterThanOrEqualTo(processMatchValueVariables(spec.MatchValue, variables))
 	},
-	RegexMatches: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	RegexMatches: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.RegexMatches(processMatchValueVariables(spec.MatchValue, variables))
 	},
-	IsAny: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	IsAny: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		return attribute != nil && attribute.IsAny(unpackInterfaceToInterfaceSlice(processMatchValueVariables(spec.MatchValue, variables))...)
 	},
-	IsNone: func(block block.Block, spec *MatchSpec, variables map[string]string) bool {
+	IsNone: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
 		attribute := block.GetAttribute(spec.Name)
 		if attribute.IsNil() {
 			return spec.IgnoreUndefined
 		}
 		return attribute.IsNone(unpackInterfaceToInterfaceSlice(processMatchValueVariables(spec.MatchValue, variables))...)
+	},
+	RequiresPresence: func(block block.Block, spec *MatchSpec, module block.Module, variables map[string]string) bool {
+		return resourceFound(spec, module)
 	},
 }
 
@@ -179,15 +182,13 @@ func evalMatchSpec(b block.Block, spec *MatchSpec, module block.Module, variable
 	case InModule:
 		return b.InModule()
 	case RegexMatches:
-		if !matchFunctions[RegexMatches](b, spec, variables) {
+		if !matchFunctions[RegexMatches](b, spec, module, variables) {
 			return spec.IgnoreUnmatched
 		}
 	case HasTag:
 		return checkTags(b, spec, module)
 	case OfType:
 		return ofType(b, spec)
-	case RequiresPresence:
-		return resourceFound(spec, module)
 	case Not:
 		return notifyPredicate(b, spec, module, variables)
 	case And:
@@ -195,7 +196,7 @@ func evalMatchSpec(b block.Block, spec *MatchSpec, module block.Module, variable
 	case Or:
 		return processOrPredicate(spec, b, module, variables)
 	default:
-		evalResult = matchFunctions[spec.Action](b, spec, variables)
+		evalResult = matchFunctions[spec.Action](b, spec, module, variables)
 	}
 
 	if len(spec.AssignVariable) > 0 {
@@ -237,7 +238,14 @@ func processAndPredicate(spec *MatchSpec, b block.Block, module block.Module, va
 }
 
 func processSubMatches(spec *MatchSpec, b block.Block, module block.Module, variables map[string]string, evalResult bool) bool {
-	for _, b := range b.GetBlocks(spec.Name) {
+	var subMatchTargets []block.Block
+	switch spec.Action {
+	case RequiresPresence:
+		subMatchTargets = module.GetResourcesByType(spec.Name)
+	default:
+		subMatchTargets = b.GetBlocks(spec.Name)
+	}
+	for _, b := range subMatchTargets {
 		evalResult = evalMatchSpec(b, spec.SubMatch, nil, variables)
 		if !evalResult {
 			break
