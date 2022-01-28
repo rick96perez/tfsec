@@ -52,8 +52,13 @@ func (r *Result) Flatten() FlatResult {
 	if err != nil {
 		log.Println(err)
 	}
+	// log.Print("Current Working Directory:")
+	// log.Println(cwd)
 
 	file := strings.ReplaceAll(path, cwd+"/", "")
+
+	// log.Print("Current File Name:")
+	// log.Println(file)
 
 	return FlatResult{
 		RuleID:          r.rule.AVDID + "-" + r.Rule().LongID() + "-" + strconv.Itoa(rng.GetStartLine()),

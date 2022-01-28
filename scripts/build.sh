@@ -13,6 +13,6 @@ GOOS=darwin GOARCH=amd64 go build -o bin/darwin/${BINARY}-darwin-amd64 "${args[@
 mkdir -p bin/linux
 GOOS=linux GOARCH=amd64 go build -o bin/linux/${BINARY}-linux-amd64 "${args[@]}" ./cmd/tfsec/
 # GOOS=linux GOARCH=amd64 go build -o bin/linux/${CHECK_GEN_BINARY}-linux-amd64 "${args[@]}" ./cmd/tfsec-checkgen/
-mkdir -p bin/windows
-GOOS=windows GOARCH=amd64 go build -o bin/windows/${BINARY}-windows-amd64.exe "${args[@]}" ./cmd/tfsec/
+# mkdir -p bin/windows
+# GOOS=windows GOARCH=amd64 go build -o bin/windows/${BINARY}-windows-amd64.exe "${args[@]}" ./cmd/tfsec/
 # GOOS=windows GOARCH=amd64 go build -o bin/windows/${CHECK_GEN_BINARY}-windows-amd64.exe "${args[@]}" ./cmd/tfsec-checkgen/
